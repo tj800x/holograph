@@ -1,7 +1,6 @@
+import React, { useCallback, useEffect, useState } from "react";
 import "./index.css";
 import "./App.css";
-
-import { useCallback, useEffect, useState } from "react";
 import { Tldraw } from "tldraw";
 import deepDiff from "./deepDiff";
 import CustomHelpMenu from "./CustomHelpMenu";
@@ -44,48 +43,46 @@ export default function StoreEventsExample() {
           editor.createAssets(tutorial.assets);
           editor.createShapes(tutorial.shapes);
         });
-      // .catch((error) => console.error(error));
+			// .catch((error) => console.error(error));
     }
   }, [editor]);
 
   useEffect(() => {
     if (!editor) return;
 
-    //[1]
     const handleChangeEvent = (change) => {
-      // Added
       for (const record of Object.values(change.changes.added)) {
         if (record.typeName === "shape") {
           // console.log(`created shape (${JSON.stringify(record)})\n`);
-        }
+				}
       }
 
-      // Updated
       for (const [from, to] of Object.values(change.changes.updated)) {
         if (from.id.startsWith("shape") && to.id.startsWith("shape")) {
           let diff = deepDiff(from, to);
           // console.log("diff: ", diff);
-
+					
           if (Object.keys(diff).every((key) => ignoredKeys.includes(key))) {
             // Ignore changes that should not trigger a re-propagation
-          } else if (to.typeName === "shape") {
+					} else if (to.typeName === "shape") {
             if (to.type === "arrow") {
               let startId = to.props.start.boundShapeId;
               let endId = to.props.end.boundShapeId;
               let newStart = diff["props.start.boundShapeId"] && endId;
               let newEnd = diff["props.end.boundShapeId"] && startId;
               if (newStart || newEnd) {
-                // Newly connected arrow
+								// Newly connected arrow
                 update(startId, editor);
               }
               if (diff["props.text"] && startId && endId) {
                 // Updated arrow text
-                update(startId, editor);
+								update(startId, editor);
               }
             } else {
-              // All other changes trigger propagation.
-              // This can be optimized to only updating based on connected arrows.
-              update(to.id, editor);
+               // All other changes trigger propagation.
+               // This can be optimized to only updating based on connected arrows.
+
+               update(to.id, editor);
             }
           }
         }
